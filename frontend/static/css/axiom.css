@@ -1,0 +1,837 @@
+/* ===================================================================
+   AXIOM HEALTH &bull; Autonomous Medical AI Platform
+   Design Reference: Axiom (https://axiom-gilt.vercel.app / noekunn/Axiom)
+   Obsidian (#080808), Charcoal (#111111), Emerald (#10B981), Cyber-Grid
+   =================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+
+:root {
+  --axiom-bg: #080808;
+  --axiom-surface-subtle: #0d0d0d;
+  --axiom-surface: #121212;
+  --axiom-surface-card: #141414;
+  --axiom-surface-card-hover: #191919;
+  --axiom-surface-elevated: #1e1e1e;
+  
+  --axiom-border-subtle: rgba(255, 255, 255, 0.06);
+  --axiom-border: #222222;
+  --axiom-border-hover: rgba(255, 255, 255, 0.18);
+  --axiom-border-active: rgba(16, 185, 129, 0.4);
+
+  --axiom-text-primary: #f5f5f5;
+  --axiom-text-secondary: #a1a1aa;
+  --axiom-text-muted: #71717a;
+  --axiom-text-faint: #52525b;
+
+  --axiom-emerald: #10B981;
+  --axiom-emerald-glow: rgba(16, 185, 129, 0.25);
+  --axiom-emerald-subtle: rgba(16, 185, 129, 0.10);
+  
+  --axiom-amber: #f59e0b;
+  --axiom-amber-subtle: rgba(245, 158, 11, 0.10);
+
+  --axiom-rose: #ef4444;
+  --axiom-rose-subtle: rgba(239, 68, 68, 0.10);
+
+  --axiom-cyan: #06b6d4;
+  --axiom-cyan-subtle: rgba(6, 182, 212, 0.10);
+  
+  --axiom-font-display: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --axiom-font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --axiom-font-mono: 'JetBrains Mono', Consolas, Monaco, monospace;
+}
+
+/* Base Body & Reset */
+html {
+  scroll-behavior: smooth;
+}
+
+body.axiom-theme {
+  margin: 0;
+  padding: 0;
+  color: var(--axiom-text-primary);
+  background-color: var(--axiom-bg);
+  background-image: 
+    radial-gradient(circle 800px at 50% -150px, rgba(255, 255, 255, 0.05), transparent 70%),
+    radial-gradient(circle 600px at 85% 90%, rgba(16, 185, 129, 0.03), transparent 60%);
+  background-attachment: fixed;
+  font-family: var(--axiom-font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Typography Hierarchy */
+h1, h2, h3, h4, h5, h6, .font-headline, .font-display {
+  font-family: var(--axiom-font-display);
+  letter-spacing: -0.028em;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+p, .font-body {
+  font-family: var(--axiom-font-body);
+  color: var(--axiom-text-secondary);
+  line-height: 1.7;
+}
+
+.font-mono, code, kbd, .font-telemetry {
+  font-family: var(--axiom-font-mono) !important;
+}
+
+/* Container Width Consistency */
+.container-axiom, .container-xl {
+  max-width: 1240px !important;
+}
+
+/* Generous Vertical Section Spacing */
+.axiom-section {
+  padding-top: 5.5rem;
+  padding-bottom: 5.5rem;
+  position: relative;
+}
+
+.axiom-section-hero {
+  padding-top: 4.5rem;
+  padding-bottom: 5rem;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .axiom-section {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+  .axiom-section-hero {
+    padding-top: 2.5rem;
+    padding-bottom: 3.5rem;
+  }
+}
+
+/* Section Header Structure */
+.section-header {
+  margin-bottom: 3.5rem;
+}
+
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--axiom-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--axiom-emerald);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  font-size: 1rem;
+  color: var(--axiom-text-secondary);
+  max-width: 640px;
+  line-height: 1.7;
+}
+
+/* Cyber Grid Background Overlay */
+.bg-grid-cyber {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+
+/* Cursor Aura Flashlight (Smooth Axiom Flashlight Effect) */
+#cursorAura {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Subtle Ambient Aurora Background */
+.aurora-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+}
+
+.aurora-1 {
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.6), transparent 70%);
+  top: -80px;
+  left: 10%;
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+
+.aurora-2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 70%);
+  top: -120px;
+  right: 8%;
+  animation: aurora-drift 22s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes aurora-drift {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  50%  { transform: translate(40px, -30px) scale(1.06); }
+  100% { transform: translate(-30px, 20px) scale(0.96); }
+}
+
+/* Liquid Chrome Shimmer Text */
+.animate-shimmer-x {
+  background: linear-gradient(90deg, #888888 0%, #ffffff 50%, #888888 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-x 3.5s linear infinite;
+}
+
+@keyframes shimmer-x {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Axiom Obsidian Cards & Panels */
+.axiom-card {
+  background: var(--axiom-surface-card);
+  border: 1px solid var(--axiom-border);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.axiom-card:hover {
+  border-color: var(--axiom-border-hover);
+  background: var(--axiom-surface-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
+}
+
+.axiom-panel {
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--axiom-border);
+  border-radius: 18px;
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* Axiom Navbar */
+.axiom-navbar {
+  background: rgba(8, 8, 8, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.85rem 0;
+  z-index: 1040;
+  transition: all 0.25s ease;
+}
+
+.axiom-brand-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #141414;
+  border: 1px solid var(--axiom-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.axiom-nav-link {
+  color: var(--axiom-text-secondary) !important;
+  font-size: 0.86rem;
+  font-weight: 500;
+  padding: 0.45rem 0.85rem !important;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.axiom-nav-link:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.axiom-nav-link.active {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Mobile Nav Drawer */
+.mobile-nav-toggle {
+  background: transparent;
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text-primary);
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mobile-nav-drawer {
+  background: rgba(10, 10, 10, 0.98);
+  border-bottom: 1px solid var(--axiom-border);
+  padding: 1.25rem 1.5rem;
+}
+
+/* Axiom Buttons */
+.btn-axiom-primary {
+  background: #ffffff;
+  color: #09090b !important;
+  font-family: var(--axiom-font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  padding: 0.65rem 1.35rem;
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-axiom-primary:hover {
+  background: #e4e4e7;
+  color: #000000 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.2);
+}
+
+.btn-axiom-emerald {
+  background: var(--axiom-emerald);
+  color: #09090b !important;
+  font-family: var(--axiom-font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  padding: 0.65rem 1.35rem;
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-axiom-emerald:hover {
+  background: #059669;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px var(--axiom-emerald-glow);
+}
+
+.btn-axiom-glass {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--axiom-text-primary) !important;
+  border: 1px solid var(--axiom-border);
+  font-family: var(--axiom-font-body);
+  font-weight: 500;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  padding: 0.65rem 1.25rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-axiom-glass:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--axiom-border-hover);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* Status Pulse Dot */
+.axiom-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--axiom-emerald);
+  display: inline-block;
+  box-shadow: 0 0 6px var(--axiom-emerald);
+  animation: axiom-pulse 2s infinite ease-in-out;
+}
+
+.axiom-pulse-dot.rose {
+  background: var(--axiom-rose);
+  box-shadow: 0 0 6px var(--axiom-rose);
+}
+
+.axiom-pulse-dot.amber {
+  background: var(--axiom-amber);
+  box-shadow: 0 0 6px var(--axiom-amber);
+}
+
+@keyframes axiom-pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+/* Metric KPI Card (Axiom MetricCard style) */
+.metric-box {
+  background: var(--axiom-surface-card);
+  border: 1px solid var(--axiom-border);
+  border-radius: 14px;
+  padding: 1.35rem 1.5rem;
+  transition: all 0.25s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metric-box:hover {
+  border-color: var(--axiom-border-hover);
+  background: var(--axiom-surface-card-hover);
+  transform: translateY(-2px);
+}
+
+.metric-label {
+  font-family: var(--axiom-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--axiom-text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.metric-val {
+  font-family: var(--axiom-font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.metric-sub {
+  font-family: var(--axiom-font-mono);
+  font-size: 0.72rem;
+  margin-top: 0.4rem;
+}
+
+/* Terminal Console Box (Axiom TerminalConsole style) */
+.terminal-window {
+  background: #0b0b0b;
+  border: 1px solid var(--axiom-border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7);
+}
+
+.terminal-header {
+  background: #111111;
+  border-bottom: 1px solid var(--axiom-border);
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #10b981; }
+
+.terminal-body {
+  padding: 1.25rem 1.35rem;
+  font-family: var(--axiom-font-mono);
+  font-size: 0.80rem;
+  color: #a1a1aa;
+  height: 250px;
+  overflow-y: auto;
+  line-height: 1.75;
+  background: #09090b;
+}
+
+.terminal-line {
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.terminal-footer {
+  background: #111111;
+  border-top: 1px solid var(--axiom-border);
+  padding: 0.75rem 1.15rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Axiom Form Inputs & Range Sliders */
+.axiom-input-card {
+  background: #121212;
+  border: 1px solid var(--axiom-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.axiom-input-card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.axiom-input-card:focus-within {
+  border-color: var(--axiom-border-active);
+  box-shadow: 0 0 15px -3px var(--axiom-emerald-subtle);
+}
+
+.axiom-form-control {
+  background: #09090b !important;
+  border: 1px solid var(--axiom-border) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  font-family: var(--axiom-font-mono);
+  font-size: 0.90rem;
+  padding: 0.45rem 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.axiom-form-control:focus {
+  border-color: var(--axiom-emerald) !important;
+  box-shadow: 0 0 10px var(--axiom-emerald-glow) !important;
+  outline: none;
+}
+
+/* Custom Sleek Range Slider */
+.axiom-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #222222;
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.axiom-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--axiom-emerald);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.axiom-range::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+}
+
+.axiom-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--axiom-emerald);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+/* Preset Buttons */
+.preset-pill {
+  background: #121212;
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text-secondary);
+  font-family: var(--axiom-font-mono);
+  font-size: 0.75rem;
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.preset-pill:hover {
+  background: #1c1c1c;
+  color: #ffffff;
+  border-color: var(--axiom-border-hover);
+}
+
+.preset-pill.active {
+  background: var(--axiom-emerald-subtle);
+  border-color: var(--axiom-emerald);
+  color: var(--axiom-emerald);
+  font-weight: 600;
+}
+
+/* Risk Badges */
+.risk-badge-emerald {
+  background: var(--axiom-emerald-subtle);
+  color: var(--axiom-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.risk-badge-amber {
+  background: var(--axiom-amber-subtle);
+  color: var(--axiom-amber);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.risk-badge-rose {
+  background: var(--axiom-rose-subtle);
+  color: var(--axiom-rose);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+/* Clean Custom Table */
+.axiom-table {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.axiom-table th {
+  background: #101010;
+  color: var(--axiom-text-muted);
+  font-family: var(--axiom-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid var(--axiom-border);
+  font-weight: 600;
+}
+
+.axiom-table td {
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+  color: var(--axiom-text-secondary);
+}
+
+.axiom-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+  color: #ffffff;
+}
+
+/* Axiom Public Footer */
+.axiom-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #09090b;
+  padding: 4rem 0 2.5rem;
+  font-size: 0.84rem;
+  color: var(--axiom-text-muted);
+}
+
+.axiom-footer a {
+  color: var(--axiom-text-secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.axiom-footer a:hover {
+  color: #ffffff;
+}
+
+/* Dropzone */
+.upload-dropzone {
+  border: 1px dashed var(--axiom-border);
+  background: #0e0e0e;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+
+.upload-dropzone.dragover, .upload-dropzone:hover {
+  border-color: var(--axiom-emerald);
+  background: rgba(16, 185, 129, 0.02);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+::-webkit-scrollbar-thumb {
+  background: #222222;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
+
+
+/* -------------------------------------------------------------
+   Interactive 3D Anatomical Human Eye Viewer
+   ------------------------------------------------------------- */
+.eye-viewer-panel {
+  background: rgba(14, 14, 14, 0.9);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--axiom-border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 35px -5px rgba(16, 185, 129, 0.08);
+  position: relative;
+}
+
+.eye-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.04), transparent 75%), #080808;
+}
+
+@media (max-width: 768px) {
+  .eye-canvas-wrapper {
+    height: 300px;
+  }
+}
+
+.eye-floating-hud {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.eye-floating-hud > * {
+  pointer-events: auto;
+}
+
+.eye-zoom-controls {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+}
+
+.eye-ctrl-btn {
+  background: rgba(18, 18, 18, 0.85);
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text-primary);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.eye-ctrl-btn:hover {
+  background: #222222;
+  border-color: var(--axiom-border-hover);
+  color: #ffffff;
+}
+
+.eye-layer-pill {
+  background: #121212;
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text-secondary);
+  font-family: var(--axiom-font-mono);
+  font-size: 0.70rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.eye-layer-pill:hover {
+  background: #1c1c1c;
+  color: #ffffff;
+  border-color: var(--axiom-border-hover);
+}
+
+.eye-layer-pill.active {
+  background: var(--axiom-emerald-subtle);
+  border-color: var(--axiom-emerald);
+  color: var(--axiom-emerald);
+  font-weight: 600;
+}
+
+.eye-layer-pill.retina-special {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 10px -2px rgba(16, 185, 129, 0.3);
+}
+
+.eye-info-panel {
+  background: #0b0b0b;
+  border-top: 1px solid var(--axiom-border);
+  padding: 1.15rem 1.4rem;
+}

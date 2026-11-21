@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Retinal Vision AI &bull; BruTus Health{% endblock %}
+
+{% block content %}
+<div class="container container-xl">
+
+    <!-- Header Section -->
+    <div class="axiom-section-hero pb-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-4 mb-4">
+            <div>
+                <div class="section-eyebrow mb-1">
+                    <i class="fa-solid fa-eye"></i> Vision AI Module &bull; MobileNetV2 &bull; Grad-CAM XAI
+                </div>
+                <h1 class="display-6 fw-bold text-white mb-2 font-display">Retinal Fundus Diabetic Retinopathy Vision AI</h1>
+                <p class="text-zinc-400 text-sm mb-0">
+                    Deep convolutional feature analysis with gradient-weighted class activation mapping (Grad-CAM) for visual explainability.
+                </p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge border border-emerald-800 bg-emerald-950/60 text-emerald-400 font-mono text-xs px-3 py-2 rounded-pill">
+                    <i class="fa-solid fa-microchip me-1.5"></i> 77.82% TEST ACCURACY
+                </span>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            
+            <!-- Main Ingestion Card -->
+            <div class="col-lg-8">
+                <div class="axiom-panel p-4 p-md-5">
+                    
+                    <form id="retinaUploadForm" enctype="multipart/form-data">
+                        <input type="hidden" name="sample_image" id="selectedRetinaSampleInput" value="">
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="font-mono text-xs text-zinc-400 mb-1.5 d-block">
+                                    Patient Identifier (Optional)
+                                </label>
+                                <input type="text" class="form-control axiom-form-control" name="patient_id" placeholder="e.g. BRU-RET-01" value="BRU-RET-{{ range(1000, 9999)|random }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="font-mono text-xs text-zinc-400 mb-1.5 d-block">
+                                    Clinical Notes (Optional)
+                                </label>
+                                <input type="text" class="form-control axiom-form-control" name="notes" placeholder="e.g. Right eye (OD), macula view">
+                            </div>
+                        </div>
+
+                        <!-- Dropzone -->
+                        <div class="upload-dropzone p-5 rounded-4 text-center mb-4 border border-[#222222] bg-[#0e0e0e]" id="retinaDropzone">
+                            <input type="file" id="retinaFileInput" name="image" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="d-none">
+                            
+                            <div id="retinaDropzoneEmpty">
+                                <div class="w-16 h-16 rounded-full bg-[#181818] border border-[#262626] mx-auto mb-3 d-flex align-items-center justify-content-center text-emerald-400 fs-3" style="width: 56px; height: 56px;">
+                                    <i class="fa-solid fa-eye"></i>
+                                </div>
+                                <h5 class="fw-bold text-white mb-1 font-display fs-5">Drag and drop retinal fundus photograph here</h5>
+                                <p class="text-zinc-500 font-mono text-xs mb-3">Accepted formats: JPG, JPEG, PNG (224&times;224 Standardized)</p>
+                                <button type="button" class="btn-axiom-primary btn-sm px-4 py-2" id="retinaBrowseBtn">
+                                    Browse Image File
+                                </button>
+                            </div>
+
+                            <div id="retinaDropzonePreview" class="d-none">
+                                <div class="preview-container position-relative mx-auto rounded-3 overflow-hidden shadow-sm mb-3" style="max-width: 260px;">
+                                    <img id="retinaImagePreview" src="" alt="Preview" class="img-fluid rounded">
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center gap-3">
+                                    <span class="font-mono text-xs text-white" id="retinaPreviewFilename"></span>
+                                    <button type="button" class="btn btn-outline-danger btn-sm text-xs py-1 px-3" id="retinaRemoveBtn">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <button type="submit" class="btn-axiom-emerald w-100 py-3 fs-6" id="retinaAnalyzeBtn" disabled>
+                            <i class="fa-solid fa-brain me-2"></i> Execute MobileNetV2 &amp; Grad-CAM XAI
+                        </button>
+                    </form>
+
+                    <!-- Loading Overlay -->
+                    <div id="retinaLoadingOverlay" class="d-none p-5 text-center">
+                        <div class="spinner-border text-emerald-400 mb-3" role="status"></div>
+                        <h5 class="text-white font-mono fw-bold">Executing Deep Neural Gradient Tape...</h5>
+                        <p class="text-zinc-500 font-mono text-xs">Backpropagating class gradients through out_relu layer for Grad-CAM overlay</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Sample Demo Specimens Sidebar -->
+            <div class="col-lg-4">
+                <div class="axiom-panel p-4 h-100">
+                    <h5 class="fw-bold text-white mb-1 font-display">Benchmark Retinal Specimens</h5>
+                    <p class="text-zinc-400 text-xs mb-4">Click any clinical specimen to immediately test Grad-CAM:</p>
+
+                    <div class="d-flex flex-column gap-2.5">
+                        {% for file, stage, title, sub in [
+                            ('sample_0_no_dr.jpg', 0, 'Stage 0: No DR', 'Healthy retinal vasculature'),
+                            ('sample_1_mild_dr.jpg', 1, 'Stage 1: Mild NPDR', 'Microaneurysms detected'),
+                            ('sample_2_moderate_dr.jpg', 2, 'Stage 2: Moderate NPDR', 'Hemorrhages & exudates'),
+                            ('sample_3_severe_dr.jpg', 3, 'Stage 3: Severe NPDR', '4-2-1 rule abnormalities'),
+                            ('sample_4_proliferative_dr.jpg', 4, 'Stage 4: Proliferative DR', 'Active neovascularization')
+                        ] %}
+                            <div class="retina-sample-item p-2.5 rounded-3 bg-[#111111] border border-[#222222] d-flex align-items-center gap-3 cursor-pointer" data-sample="{{ file }}" data-title="{{ title }}" style="cursor: pointer; transition: all 0.2s ease;">
+                                <img src="{{ url_for('static', filename='images/samples/' + file) }}" alt="{{ title }}" class="rounded" style="width: 46px; height: 46px; object-fit: cover; background: #000;">
+                                <div class="flex-grow-1 font-mono">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-white text-xs fw-bold">{{ title }}</span>
+                                        <i class="fa-solid fa-arrow-right text-zinc-600 text-xs"></i>
+                                    </div>
+                                    <span class="text-zinc-500 text-[10px]">{{ sub }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('retinaFileInput');
+        const browseBtn = document.getElementById('retinaBrowseBtn');
+        const dropzone = document.getElementById('retinaDropzone');
+        const emptyState = document.getElementById('retinaDropzoneEmpty');
+        const previewState = document.getElementById('retinaDropzonePreview');
+        const previewImg = document.getElementById('retinaImagePreview');
+        const filenameEl = document.getElementById('retinaPreviewFilename');
+        const removeBtn = document.getElementById('retinaRemoveBtn');
+        const analyzeBtn = document.getElementById('retinaAnalyzeBtn');
+        const sampleInput = document.getElementById('selectedRetinaSampleInput');
+        const form = document.getElementById('retinaUploadForm');
+        const loading = document.getElementById('retinaLoadingOverlay');
+
+        browseBtn?.addEventListener('click', () => fileInput.click());
+
+        fileInput?.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const f = this.files[0];
+                sampleInput.value = '';
+                previewImg.src = URL.createObjectURL(f);
+                filenameEl.textContent = f.name;
+                emptyState.classList.add('d-none');
+                previewState.classList.remove('d-none');
+                analyzeBtn.disabled = false;
+            }
+        });
+
+        removeBtn?.addEventListener('click', function () {
+            fileInput.value = '';
+            sampleInput.value = '';
+            emptyState.classList.remove('d-none');
+            previewState.classList.add('d-none');
+            analyzeBtn.disabled = true;
+        });
+
+        document.querySelectorAll('.retina-sample-item').forEach(item => {
+            item.addEventListener('click', function () {
+                document.querySelectorAll('.retina-sample-item').forEach(i => i.style.borderColor = '#222222');
+                this.style.borderColor = '#10B981';
+                const s = this.getAttribute('data-sample');
+                const t = this.getAttribute('data-title');
+                sampleInput.value = s;
+                fileInput.value = '';
+                previewImg.src = this.querySelector('img').src;
+                filenameEl.textContent = t;
+                emptyState.classList.add('d-none');
+                previewState.classList.remove('d-none');
+                analyzeBtn.disabled = false;
+            });
+        });
+
+        form?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            loading.classList.remove('d-none');
+            form.classList.add('d-none');
+
+            const fd = new FormData(form);
+            fetch('/api/predict_retinopathy', {
+                method: 'POST',
+                body: fd
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    window.location.href = d.redirect_url;
+                } else {
+                    alert("Error: " + d.error);
+                    loading.classList.add('d-none');
+                    form.classList.remove('d-none');
+                }
+            })
+            .catch(e => {
+                alert("Network error: " + e.message);
+                loading.classList.add('d-none');
+                form.classList.remove('d-none');
+            });
+        });
+    });
+</script>
+{% endblock %}

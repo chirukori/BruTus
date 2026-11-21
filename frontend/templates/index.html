@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+
+{% block title %}BruTus Health &bull; Autonomous Diabetes Prediction Platform{% endblock %}
+
+{% block content %}
+<div class="container container-xl">
+
+    <!-- ==================== 1. HERO SECTION ==================== -->
+    <section class="axiom-section-hero">
+        <div class="row align-items-center g-5">
+            
+            <!-- Hero Left Column: Headline and Action CTAs (Elements 1, 2, 3 Removed) -->
+            <div class="col-lg-6">
+                <div class="d-flex flex-column justify-content-center">
+                    
+                    <!-- Main Display Headline -->
+                    <h1 class="display-3 fw-bold text-white mb-4 tracking-tight leading-tight font-display">
+                        Autonomous AI for<br>
+                        <span class="animate-shimmer-x">Metabolic Risk Staging</span><br>
+                        &amp; Clinical Triage
+                    </h1>
+
+                    <!-- Hero Action CTAs -->
+                    <div class="d-flex flex-wrap gap-3 mb-0 pt-2">
+                        <a href="{{ url_for('predict_page') }}" class="btn-axiom-primary">
+                            <i class="fa-solid fa-bolt me-2 fs-7"></i> Launch Predictor
+                        </a>
+                        <a href="{{ url_for('analytics_page') }}" class="btn-axiom-glass">
+                            <i class="fa-solid fa-chart-line me-2 text-zinc-400 fs-7"></i> Explore Analytics
+                        </a>
+                        <a href="{{ url_for('retinopathy_page') }}" class="btn-axiom-glass">
+                            <i class="fa-solid fa-eye me-2 text-zinc-400 fs-7"></i> Retinal Vision AI
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Hero Right Column: Interactive 3D Anatomical Human Eye Viewer (Replaces Terminal) -->
+            <div class="col-lg-6">
+                <div class="eye-viewer-panel">
+                    
+                    <!-- Top HUD Bar -->
+                    <div class="p-3 bg-[#0d0d0d] border-bottom border-[#222222] d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge border border-[#2a2a2a] bg-[#141414] text-zinc-300 font-mono text-[10px]">
+                                <i class="fa-solid fa-eye text-emerald-400 me-1"></i> 3D ANATOMICAL VIEWER
+                            </span>
+                            <span class="text-zinc-500 font-mono text-[11px] d-none d-sm-inline">
+                                DIABETIC RETINOPATHY &bull; RETINAL INTELLIGENCE
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary font-mono text-[11px] py-1 px-2.5" id="btnResetEye">
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reset View
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-light font-mono text-[11px] py-1 px-2.5" id="btnExplodeEye">
+                                <i class="fa-solid fa-layer-group me-1 text-emerald-400"></i> Explode Layers
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3D WebGL Canvas Viewport -->
+                    <div class="eye-canvas-wrapper position-relative">
+                        <div id="eyeCanvasContainer" class="w-100 h-100"></div>
+
+                        <!-- Interaction Drag Hint -->
+                        <div class="position-absolute bottom-0 start-0 m-3 px-2 py-1 rounded bg-[#09090b]/80 border border-[#222222] text-zinc-400 font-mono text-[10px] pointer-events-none">
+                            <i class="fa-solid fa-arrows-spin me-1 text-emerald-400"></i> Drag to 3D Rotate &bull; Scroll to Zoom
+                        </div>
+
+                        <!-- Zoom Controls -->
+                        <div class="eye-zoom-controls">
+                            <button type="button" class="eye-ctrl-btn" id="btnZoomIn" title="Zoom In">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <button type="button" class="eye-ctrl-btn" id="btnZoomOut" title="Zoom Out">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Anatomical Layer Selector Pills -->
+                    <div class="p-2.5 bg-[#0f0f0f] border-top border-[#222222] d-flex flex-wrap gap-1.5 justify-content-center">
+                        <button type="button" class="eye-layer-pill" data-layer="all">All Layers</button>
+                        <button type="button" class="eye-layer-pill" data-layer="cornea">Cornea</button>
+                        <button type="button" class="eye-layer-pill" data-layer="iris">Iris</button>
+                        <button type="button" class="eye-layer-pill" data-layer="pupil">Pupil</button>
+                        <button type="button" class="eye-layer-pill" data-layer="lens">Lens</button>
+                        <button type="button" class="eye-layer-pill active retina-special" data-layer="retina">
+                            <span class="axiom-pulse-dot me-1"></span> Retina (DR Target)
+                        </button>
+                        <button type="button" class="eye-layer-pill" data-layer="choroid">Choroid</button>
+                        <button type="button" class="eye-layer-pill" data-layer="sclera">Sclera</button>
+                        <button type="button" class="eye-layer-pill" data-layer="optic_nerve">Optic Nerve</button>
+                    </div>
+
+                    <!-- Selected Anatomical Structure HUD Information -->
+                    <div class="eye-info-panel">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h5 class="fw-bold text-white mb-0 font-display fs-6" id="eyeStructureTitle">Retina</h5>
+                            <span class="badge border border-[#2a2a2a] bg-[#161616] text-emerald-400 font-mono text-[10px]" id="eyeStructureCat">
+                                Neurosensory Tunic ★ PRIMARY DR TARGET
+                            </span>
+                        </div>
+                        <p class="text-zinc-400 text-xs leading-relaxed mb-2" id="eyeStructureDesc">
+                            The light-sensitive neurosensory layer lining the posterior eye. Photoreceptor cells (rods and cones) convert light photons into neural action potentials transmitted via ganglion cell axons.
+                        </p>
+                        <div class="p-2.5 rounded bg-[#121212] border border-[#222222] text-zinc-300 font-sans text-xs leading-relaxed mb-2.5" id="eyeStructureClinical">
+                            <strong class="text-emerald-400 font-mono text-[11px] d-block mb-1">CLINICAL PERSPECTIVE:</strong>
+                            DIABETIC RETINOPATHY TARGET: Chronic elevated blood glucose destroys retinal capillary pericytes, causing microaneurysms, hemorrhages, hard lipid exudates, macular edema, and vision-threatening neovascularization.
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('retinopathy_page') }}" class="btn-axiom-glass btn-sm font-mono text-[11px] py-1 px-3">
+                                <i class="fa-solid fa-eye me-1.5 text-emerald-400"></i> Analyze Retinal Fundus with BruTus Vision AI &rarr;
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ==================== 2. ARCHITECTURAL PIPELINE ==================== -->
+    <section class="axiom-section border-top border-[#1a1a1a]">
+        <div class="section-header text-center mx-auto" style="max-width: 680px;">
+            <div class="section-eyebrow">
+                <i class="fa-solid fa-diagram-project"></i> Architectural Pipeline
+            </div>
+            <h2 class="section-title">Autonomous Metabolic Risk Staging</h2>
+            <p class="section-desc mx-auto">
+                BruTus replaces manual heuristic scoring with a high-dimensional classification pipeline calibrated on population health metrics to deliver early, actionable glycemic intelligence.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Step 1 -->
+            <div class="col-md-3">
+                <div class="axiom-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="font-mono text-xs text-zinc-500">01 // INGESTION</span>
+                            <div class="w-8 h-8 rounded bg-[#1c1c1c] border border-[#262626] d-flex align-items-center justify-content-center text-white text-xs">
+                                <i class="fa-solid fa-fingerprint"></i>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold text-white mb-2 fs-6">Biometric Ingestion</h5>
+                        <p class="text-zinc-400 text-xs leading-relaxed mb-0">
+                            Ingestion of 8 canonical variables: Glucose, Blood Pressure, Insulin, BMI, Skin Thickness, Pedigree, Pregnancies, and Age.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="col-md-3">
+                <div class="axiom-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="font-mono text-xs text-zinc-500">02 // STANDARDIZE</span>
+                            <div class="w-8 h-8 rounded bg-[#1c1c1c] border border-[#262626] d-flex align-items-center justify-content-center text-white text-xs">
+                                <i class="fa-solid fa-sliders"></i>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold text-white mb-2 fs-6">Scaler Transform</h5>
+                        <p class="text-zinc-400 text-xs leading-relaxed mb-0">
+                            StandardScaler normalizes differing distributions to zero-mean unit variance, mitigating dimensional scale bias.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="col-md-3">
+                <div class="axiom-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="font-mono text-xs text-zinc-500">03 // INFERENCE</span>
+                            <div class="w-8 h-8 rounded bg-[#1c1c1c] border border-[#262626] d-flex align-items-center justify-content-center text-white text-xs">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold text-white mb-2 fs-6">Random Forest Ensemble</h5>
+                        <p class="text-zinc-400 text-xs leading-relaxed mb-0">
+                            150 randomized decision trees evaluate non-linear feature splits, voting to calculate precise probability and risk boundaries.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="col-md-3">
+                <div class="axiom-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="font-mono text-xs text-zinc-500">04 // TRIAGE</span>
+                            <div class="w-8 h-8 rounded bg-[#1c1c1c] border border-[#262626] d-flex align-items-center justify-content-center text-white text-xs">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold text-white mb-2 fs-6">Dossier &amp; Export</h5>
+                        <p class="text-zinc-400 text-xs leading-relaxed mb-0">
+                            Immediate risk stratification (Low / Moderate / High Risk), biometric deviation report, and downloadable PDF generation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 3. FEATURE MATRIX (EIGHT CLINICAL VECTORS) ==================== -->
+    <section class="axiom-section border-top border-[#1a1a1a]">
+        <div class="row align-items-start g-5">
+            
+            <!-- Left Column: Importance Breakdown & Summary -->
+            <div class="col-lg-5">
+                <div class="section-eyebrow">
+                    <i class="fa-solid fa-dna"></i> Feature Matrix
+                </div>
+                <h2 class="section-title">The Eight Clinical Vectors</h2>
+                <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+                    The BruTus platform evaluates the full canonical Pima Indians metabolic profile. Relative predictive weights are calibrated against population data:
+                </p>
+
+                <div class="d-flex flex-column gap-3 mb-5">
+                    <div>
+                        <div class="d-flex justify-content-between font-mono text-xs mb-1.5">
+                            <span class="text-white">Fasting Plasma Glucose</span>
+                            <span class="text-emerald-400 fw-bold">31.4% Gini Weight</span>
+                        </div>
+                        <div class="progress" style="height: 4px; background: #222;">
+                            <div class="progress-bar bg-emerald-500" style="width: 31.4%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between font-mono text-xs mb-1.5">
+                            <span class="text-white">Body Mass Index (BMI)</span>
+                            <span class="text-emerald-400 fw-bold">22.8% Gini Weight</span>
+                        </div>
+                        <div class="progress" style="height: 4px; background: #222;">
+                            <div class="progress-bar bg-emerald-500" style="width: 22.8%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between font-mono text-xs mb-1.5">
+                            <span class="text-white">Patient Age</span>
+                            <span class="text-emerald-400 fw-bold">14.1% Gini Weight</span>
+                        </div>
+                        <div class="progress" style="height: 4px; background: #222;">
+                            <div class="progress-bar bg-emerald-500" style="width: 14.1%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between font-mono text-xs mb-1.5">
+                            <span class="text-white">Diabetes Pedigree Function</span>
+                            <span class="text-emerald-400 fw-bold">12.2% Gini Weight</span>
+                        </div>
+                        <div class="progress" style="height: 4px; background: #222;">
+                            <div class="progress-bar bg-emerald-500" style="width: 12.2%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('predict_page') }}" class="btn-axiom-primary">
+                    <i class="fa-solid fa-sliders me-2"></i> Input Biometrics Now
+                </a>
+            </div>
+
+            <!-- Right Column: 8 Feature Cards Grid -->
+            <div class="col-lg-7">
+                <div class="row g-3">
+                    
+                    <div class="col-sm-6">
+                        <div class="axiom-card p-3.5 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge border border-[#2e2e2e] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">VECTOR 01</span>
+                                <span class="text-zinc-500 font-mono text-[11px]">mg/dL</span>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Fasting Glucose</h6>
+                            <p class="text-zinc-500 text-xs mb-0">Normal: 70–99 mg/dL. Primary predictor of acute metabolic dysregulation.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="axiom-card p-3.5 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge border border-[#2e2e2e] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">VECTOR 02</span>
+                                <span class="text-zinc-500 font-mono text-[11px]">kg/m²</span>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Body Mass Index (BMI)</h6>
+                            <p class="text-zinc-500 text-xs mb-0">Normal: 18.5–24.9 kg/m². Key marker of adiposity-driven insulin resistance.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="axiom-card p-3.5 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge border border-[#2e2e2e] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">VECTOR 03</span>
+                                <span class="text-zinc-500 font-mono text-[11px]">mm Hg</span>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Blood Pressure (Diastolic)</h6>
+                            <p class="text-zinc-500 text-xs mb-0">Normal: 60–80 mm Hg. Correlates with macrovascular endothelial strain.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="axiom-card p-3.5 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge border border-[#2e2e2e] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">VECTOR 04</span>
+                                <span class="text-zinc-500 font-mono text-[11px]">μU/mL</span>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Serum Insulin</h6>
+                            <p class="text-zinc-500 text-xs mb-0">Normal: 16–166 μU/mL. Evaluates pancreatic beta-cell hypersecretion.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="axiom-card p-3.5 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge border border-[#2e2e2e] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">VECTOR 05</span>
+                                <span class="text-zinc-500 font-mono text-[11px]">mm</span>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Triceps Skin Thickness</h6>
+                            <p class="text-zinc-500 text-xs mb-0">Normal: 10–25 mm. Indicator of subcutaneous adipose layer depth.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="axiom-card p-3.5 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge border border-[#2e2e2e] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">VECTOR 06</span>
+                                <span class="text-zinc-500 font-mono text-[11px]">score</span>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Diabetes Pedigree</h6>
+                            <p class="text-zinc-500 text-xs mb-0">Normal: &lt; 0.50. Evaluates hereditary familial diabetes predisposition.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="axiom-card p-3.5 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge border border-[#2e2e2e] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">VECTOR 07</span>
+                                <span class="text-zinc-500 font-mono text-[11px]">count</span>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Pregnancies</h6>
+                            <p class="text-zinc-500 text-xs mb-0">Normal: 0–4. Historical obstetric stress on pancreatic endocrine reserve.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="axiom-card p-3.5 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge border border-[#2e2e2e] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">VECTOR 08</span>
+                                <span class="text-zinc-500 font-mono text-[11px]">years</span>
+                            </div>
+                            <h6 class="text-white fw-bold mb-1">Patient Age</h6>
+                            <p class="text-zinc-500 text-xs mb-0">Adult cohort baseline. Age-dependent insulin sensitivity deterioration.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ==================== 4. CALL TO ACTION ==================== -->
+    <section class="axiom-section border-top border-[#1a1a1a]">
+        <div class="axiom-panel p-5 text-center position-relative overflow-hidden" style="background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.06), transparent 70%), #121212;">
+            <div class="position-relative z-10 mx-auto" style="max-width: 640px;">
+                <span class="axiom-pulse-dot mb-3"></span>
+                <h2 class="display-6 fw-bold text-white mb-3 tracking-tight">Ready to Evaluate a Patient Case?</h2>
+                <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+                    Input the 8 canonical clinical indicators to receive instantaneous probability breakdown, biometric deviation analysis, and an official BruTus PDF medical dossier.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('predict_page') }}" class="btn-axiom-primary px-4 py-2.5">
+                        <i class="fa-solid fa-bolt me-2 fs-7"></i> Launch Predictor Terminal
+                    </a>
+                    <a href="{{ url_for('retinopathy_page') }}" class="btn-axiom-glass px-4 py-2.5">
+                        <i class="fa-solid fa-eye me-2 fs-7"></i> Retinal Vision AI
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Interactive 3D Anatomical Human Eye Controller -->
+<script src="{{ url_for('static', filename='js/eye3d.js') }}"></script>
+{% endblock %}
