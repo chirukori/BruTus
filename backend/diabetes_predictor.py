@@ -24,6 +24,13 @@ CLINICAL_RANGES = {
     'Age': {'unit': 'years', 'min': 21, 'max': 81, 'normal_min': 21, 'normal_max': 45, 'label': 'Patient Age'}
 }
 
+# Empirical baseline defaults derived from PIMA training set statistics and clinical adult medians
+DEFAULT_IMPUTATIONS = {
+    'Glucose': 100.0,       # Adult normal fasting plasma glucose baseline (clinical standard: 70-99 mg/dL)
+    'SkinThickness': 21.0,  # PIMA training cohort mean (20.8 mm; normal adult range: 10-25 mm)
+    'Insulin': 79.0         # PIMA training cohort mean (79.8 μU/mL; normal adult range: 16-166 μU/mL)
+}
+
 def load_diabetes_model():
     global _MODEL_BUNDLE
     if _MODEL_BUNDLE is None:
@@ -57,7 +64,10 @@ def predict_diabetes_risk(input_data):
     for f in features:
         val = input_data.get(f)
         if val is None or val == '':
-            raise ValueError(f"Missing required input parameter: '{f}'")
+            if f in DEFAULT_IMPUTATIONS:
+                val = DEFAULT_IMPUTATIONS[f]
+            else:
+                raise ValueError(f"Missing required input parameter: '{f}'")
         raw_values.append(float(val))
         
     import pandas as pd

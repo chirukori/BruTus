@@ -1,325 +1,235 @@
 {% extends 'base.html' %}
 
-{% block title %}Predict Diabetes Risk &bull; BruTus Health{% endblock %}
+{% block title %}Diabetes Risk Predictor &bull; BruTus Health{% endblock %}
 
 {% block content %}
 <div class="container container-xl">
 
-    <!-- Top Breadcrumb & Header Section -->
-    <div class="axiom-section-hero pb-4">
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-4 mb-4">
-            <div>
-                <div class="section-eyebrow mb-1">
-                    <i class="fa-solid fa-microchip"></i> Diagnostic Terminal &bull; 8-Parameter Tensor
-                </div>
-                <h1 class="display-6 fw-bold text-white mb-2 font-display">Diabetes Risk Prediction Terminal</h1>
-                <p class="text-zinc-400 text-sm mb-0">
-                    Ingest patient biometric markers to compute multi-variable non-linear diabetic pathology probability.
-                </p>
-            </div>
-
-            <!-- Quick Profile Presets -->
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span class="text-zinc-500 font-mono text-xs d-none d-sm-inline">Clinical Presets:</span>
-                <button type="button" class="preset-pill active" data-preset="optimal">
-                    <i class="fa-solid fa-heart-pulse text-emerald-400"></i> Optimal / Healthy
-                </button>
-                <button type="button" class="preset-pill" data-preset="borderline">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Pre-Diabetic
-                </button>
-                <button type="button" class="preset-pill" data-preset="highrisk">
-                    <i class="fa-solid fa-radiation text-rose-400"></i> High-Risk Profile
-                </button>
-            </div>
+    <!-- Compact Centered Predictor Wrapper -->
+    <div class="py-4 py-md-5 mx-auto" style="max-width: 820px;">
+        
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-6 fw-bold text-white mb-2 font-display tracking-tight">DIABETES RISK PREDICTOR</h1>
+            <p class="text-zinc-400 text-sm mb-0">
+                Enter your clinical measurements to evaluate your predicted diabetes risk.
+            </p>
         </div>
 
-        <form id="diabetesPredictionForm">
-            <div class="row g-4">
+        <!-- Form Card Container -->
+        <div class="axiom-panel p-4 p-md-4 rounded-3 border border-[#222222]">
+            <form id="diabetesPredictionForm">
                 
-                <!-- ==================== LEFT COLUMN: 8 BIOMETRIC INPUTS ==================== -->
-                <div class="col-lg-8">
-                    <div class="axiom-panel p-4 p-md-5">
-                        
-                        <!-- Patient Identification Bar -->
-                        <div class="row g-3 pb-4 mb-4 border-bottom border-[#222222]">
-                            <div class="col-md-6">
-                                <label class="font-mono text-xs text-zinc-400 mb-1.5 d-block">
-                                    <i class="fa-solid fa-id-card text-zinc-500 me-1"></i> Patient Identifier / MRN
+                <!-- 2-Column Responsive Input Grid (Desktop: 2 cols, Mobile: 1 col) -->
+                <div class="row g-3 mb-3">
+                    
+                    <!-- 1. Pregnancies -->
+                    <div class="col-md-6">
+                        <div class="axiom-input-card p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <label class="text-white font-mono text-xs fw-semibold mb-0">
+                                    <i class="fa-solid fa-person-breastfeeding text-zinc-300 me-1.5"></i> Number of Pregnancies
                                 </label>
-                                <input type="text" class="form-control axiom-form-control" id="patientIdInput" placeholder="e.g. BRU-94821" value="BRU-{{ range(100000, 999999)|random }}">
+                                <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">count</span>
                             </div>
-                            <div class="col-md-6">
-                                <label class="font-mono text-xs text-zinc-400 mb-1.5 d-block">
-                                    <i class="fa-solid fa-user text-zinc-500 me-1"></i> Patient Full Name (Optional)
-                                </label>
-                                <input type="text" class="form-control axiom-form-control" id="patientNameInput" placeholder="e.g. John Doe">
+                            <div class="d-flex align-items-center gap-2.5 my-1.5">
+                                <input type="range" class="axiom-range flex-grow-1" id="range_Pregnancies" min="0" max="17" step="1" value="0">
+                                <input type="number" class="form-control axiom-form-control text-center py-1 font-mono text-xs" style="width: 72px;" id="input_Pregnancies" min="0" max="17" step="1" value="0" required>
+                            </div>
+                            <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500">
+                                <span>Min: 0</span>
+                                <span class="text-emerald-400">Typical: 0–4</span>
+                                <span>Max: 17</span>
                             </div>
                         </div>
-
-                        <!-- Section Title -->
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold text-white mb-0 font-display fs-5">Clinical Biometric Measurements</h5>
-                            <span class="text-zinc-500 font-mono text-xs">8 Parameters Ingested</span>
-                        </div>
-                        <p class="text-zinc-400 text-xs mb-4">
-                            Adjust values using the precision range sliders or type directly into numerical input fields.
-                        </p>
-
-                        <!-- 8 Inputs in a Balanced 2-Column Grid (4 Rows × 2 Columns) -->
-                        <div class="row g-3">
-                            
-                            <!-- 1. Glucose -->
-                            <div class="col-md-6">
-                                <div class="axiom-input-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="text-white font-mono text-xs fw-semibold mb-0">
-                                            <i class="fa-solid fa-droplet text-rose-400 me-1.5"></i> Fasting Glucose
-                                        </label>
-                                        <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">mg/dL</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 my-2">
-                                        <input type="range" class="axiom-range flex-grow-1" id="range_Glucose" min="0" max="250" step="1" value="85">
-                                        <input type="number" class="form-control axiom-form-control text-center" style="width: 76px;" id="input_Glucose" min="0" max="250" step="1" value="85" required>
-                                    </div>
-                                    <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500 mt-1">
-                                        <span>Min: 0</span>
-                                        <span class="text-emerald-400">Normal: 70–99 mg/dL</span>
-                                        <span>Max: 250</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 2. BMI -->
-                            <div class="col-md-6">
-                                <div class="axiom-input-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="text-white font-mono text-xs fw-semibold mb-0">
-                                            <i class="fa-solid fa-weight-scale text-cyan-400 me-1.5"></i> Body Mass Index (BMI)
-                                        </label>
-                                        <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">kg/m²</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 my-2">
-                                        <input type="range" class="axiom-range flex-grow-1" id="range_BMI" min="10" max="67" step="0.1" value="21.8">
-                                        <input type="number" class="form-control axiom-form-control text-center" style="width: 76px;" id="input_BMI" min="10" max="67" step="0.1" value="21.8" required>
-                                    </div>
-                                    <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500 mt-1">
-                                        <span>Min: 10</span>
-                                        <span class="text-emerald-400">Normal: 18.5–24.9</span>
-                                        <span>Max: 67</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 3. Blood Pressure -->
-                            <div class="col-md-6">
-                                <div class="axiom-input-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="text-white font-mono text-xs fw-semibold mb-0">
-                                            <i class="fa-solid fa-heart-pulse text-rose-500 me-1.5"></i> Blood Pressure (Diastolic)
-                                        </label>
-                                        <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">mm Hg</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 my-2">
-                                        <input type="range" class="axiom-range flex-grow-1" id="range_BloodPressure" min="0" max="140" step="1" value="68">
-                                        <input type="number" class="form-control axiom-form-control text-center" style="width: 76px;" id="input_BloodPressure" min="0" max="140" step="1" value="68" required>
-                                    </div>
-                                    <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500 mt-1">
-                                        <span>Min: 0</span>
-                                        <span class="text-emerald-400">Normal: 60–80 mm Hg</span>
-                                        <span>Max: 140</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 4. Insulin -->
-                            <div class="col-md-6">
-                                <div class="axiom-input-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="text-white font-mono text-xs fw-semibold mb-0">
-                                            <i class="fa-solid fa-syringe text-purple-400 me-1.5"></i> 2-Hour Serum Insulin
-                                        </label>
-                                        <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">μU/mL</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 my-2">
-                                        <input type="range" class="axiom-range flex-grow-1" id="range_Insulin" min="0" max="850" step="1" value="75">
-                                        <input type="number" class="form-control axiom-form-control text-center" style="width: 76px;" id="input_Insulin" min="0" max="850" step="1" value="75" required>
-                                    </div>
-                                    <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500 mt-1">
-                                        <span>Min: 0</span>
-                                        <span class="text-emerald-400">Normal: 16–166 μU/mL</span>
-                                        <span>Max: 850</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 5. Skin Thickness -->
-                            <div class="col-md-6">
-                                <div class="axiom-input-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="text-white font-mono text-xs fw-semibold mb-0">
-                                            <i class="fa-solid fa-ruler-vertical text-amber-400 me-1.5"></i> Triceps Skin Thickness
-                                        </label>
-                                        <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">mm</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 my-2">
-                                        <input type="range" class="axiom-range flex-grow-1" id="range_SkinThickness" min="0" max="99" step="1" value="20">
-                                        <input type="number" class="form-control axiom-form-control text-center" style="width: 76px;" id="input_SkinThickness" min="0" max="99" step="1" value="20" required>
-                                    </div>
-                                    <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500 mt-1">
-                                        <span>Min: 0</span>
-                                        <span class="text-emerald-400">Normal: 10–25 mm</span>
-                                        <span>Max: 99</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 6. Diabetes Pedigree Function -->
-                            <div class="col-md-6">
-                                <div class="axiom-input-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="text-white font-mono text-xs fw-semibold mb-0">
-                                            <i class="fa-solid fa-dna text-blue-400 me-1.5"></i> Diabetes Pedigree Function
-                                        </label>
-                                        <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">score</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 my-2">
-                                        <input type="range" class="axiom-range flex-grow-1" id="range_DiabetesPedigreeFunction" min="0.05" max="2.45" step="0.001" value="0.18">
-                                        <input type="number" class="form-control axiom-form-control text-center" style="width: 76px;" id="input_DiabetesPedigreeFunction" min="0.05" max="2.45" step="0.001" value="0.18" required>
-                                    </div>
-                                    <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500 mt-1">
-                                        <span>Min: 0.05</span>
-                                        <span class="text-emerald-400">Normal: &lt; 0.50 score</span>
-                                        <span>Max: 2.45</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 7. Pregnancies -->
-                            <div class="col-md-6">
-                                <div class="axiom-input-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="text-white font-mono text-xs fw-semibold mb-0">
-                                            <i class="fa-solid fa-person-breastfeeding text-zinc-300 me-1.5"></i> Number of Pregnancies
-                                        </label>
-                                        <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">count</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 my-2">
-                                        <input type="range" class="axiom-range flex-grow-1" id="range_Pregnancies" min="0" max="17" step="1" value="0">
-                                        <input type="number" class="form-control axiom-form-control text-center" style="width: 76px;" id="input_Pregnancies" min="0" max="17" step="1" value="0" required>
-                                    </div>
-                                    <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500 mt-1">
-                                        <span>Min: 0</span>
-                                        <span class="text-emerald-400">Typical: 0–4 count</span>
-                                        <span>Max: 17</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 8. Age -->
-                            <div class="col-md-6">
-                                <div class="axiom-input-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="text-white font-mono text-xs fw-semibold mb-0">
-                                            <i class="fa-solid fa-calendar-days text-zinc-300 me-1.5"></i> Patient Age
-                                        </label>
-                                        <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">years</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3 my-2">
-                                        <input type="range" class="axiom-range flex-grow-1" id="range_Age" min="18" max="90" step="1" value="24">
-                                        <input type="number" class="form-control axiom-form-control text-center" style="width: 76px;" id="input_Age" min="18" max="90" step="1" value="24" required>
-                                    </div>
-                                    <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500 mt-1">
-                                        <span>Min: 18</span>
-                                        <span class="text-emerald-400">Adult baseline</span>
-                                        <span>Max: 90</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <!-- Action Submit Predict Button -->
-                        <div class="mt-4 pt-3 border-top border-[#222222]">
-                            <button type="submit" class="btn-axiom-primary w-100 py-3 fs-6" id="predictSubmitBtn">
-                                <i class="fa-solid fa-bolt me-2"></i> Execute AI Risk Prediction
-                            </button>
-                        </div>
-
                     </div>
+
+                    <!-- 2. Blood Pressure (Diastolic) -->
+                    <div class="col-md-6">
+                        <div class="axiom-input-card p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <label class="text-white font-mono text-xs fw-semibold mb-0">
+                                    <i class="fa-solid fa-heart-pulse text-rose-500 me-1.5"></i> Blood Pressure (Diastolic)
+                                </label>
+                                <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">mm Hg</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2.5 my-1.5">
+                                <input type="range" class="axiom-range flex-grow-1" id="range_BloodPressure" min="40" max="130" step="1" value="70">
+                                <input type="number" class="form-control axiom-form-control text-center py-1 font-mono text-xs" style="width: 72px;" id="input_BloodPressure" min="40" max="130" step="1" value="70" required>
+                            </div>
+                            <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500">
+                                <span>Min: 40</span>
+                                <span class="text-emerald-400">Normal: 60–80</span>
+                                <span>Max: 130</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Body Mass Index (BMI) -->
+                    <div class="col-md-6">
+                        <div class="axiom-input-card p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <label class="text-white font-mono text-xs fw-semibold mb-0">
+                                    <i class="fa-solid fa-weight-scale text-cyan-400 me-1.5"></i> Body Mass Index (BMI)
+                                </label>
+                                <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">kg/m²</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2.5 my-1.5">
+                                <input type="range" class="axiom-range flex-grow-1" id="range_BMI" min="12" max="60" step="0.1" value="22.5">
+                                <input type="number" class="form-control axiom-form-control text-center py-1 font-mono text-xs" style="width: 72px;" id="input_BMI" min="12" max="60" step="0.1" value="22.5" required>
+                            </div>
+                            <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500">
+                                <span>Min: 12.0</span>
+                                <span class="text-emerald-400">Normal: 18.5–24.9</span>
+                                <span>Max: 60.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Diabetes Pedigree Function -->
+                    <div class="col-md-6">
+                        <div class="axiom-input-card p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <label class="text-white font-mono text-xs fw-semibold mb-0">
+                                    <i class="fa-solid fa-dna text-blue-400 me-1.5"></i> Diabetes Pedigree Function
+                                </label>
+                                <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">score</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2.5 my-1.5">
+                                <input type="range" class="axiom-range flex-grow-1" id="range_DiabetesPedigreeFunction" min="0.05" max="2.40" step="0.01" value="0.25">
+                                <input type="number" class="form-control axiom-form-control text-center py-1 font-mono text-xs" style="width: 72px;" id="input_DiabetesPedigreeFunction" min="0.05" max="2.40" step="0.01" value="0.25" required>
+                            </div>
+                            <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500">
+                                <span>Min: 0.05</span>
+                                <span class="text-emerald-400">Normal: &lt; 0.50</span>
+                                <span>Max: 2.40</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Patient Age -->
+                    <div class="col-md-6">
+                        <div class="axiom-input-card p-3 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <label class="text-white font-mono text-xs fw-semibold mb-0">
+                                    <i class="fa-solid fa-calendar-days text-zinc-300 me-1.5"></i> Patient Age
+                                </label>
+                                <span class="badge border border-[#2a2a2a] bg-[#1a1a1a] text-zinc-400 font-mono text-[10px]">years</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2.5 my-1.5">
+                                <input type="range" class="axiom-range flex-grow-1" id="range_Age" min="18" max="90" step="1" value="28">
+                                <input type="number" class="form-control axiom-form-control text-center py-1 font-mono text-xs" style="width: 72px;" id="input_Age" min="18" max="90" step="1" value="28" required>
+                            </div>
+                            <div class="d-flex justify-content-between font-mono text-[10px] text-zinc-500">
+                                <span>Min: 18</span>
+                                <span class="text-emerald-400">Adult baseline</span>
+                                <span>Max: 90</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Auto-Supplied Laboratory Baselines Tile (Disclosure) -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 bg-[#101010] border border-[#222222] h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                    <span class="text-white font-mono text-xs fw-semibold">
+                                        <i class="fa-solid fa-flask-vial text-emerald-400 me-1.5"></i> Auto Laboratory Baseline
+                                    </span>
+                                    <span class="badge border border-[#262626] bg-[#181818] text-emerald-400 font-mono text-[10px]">PRESET</span>
+                                </div>
+                                <p class="text-zinc-400 text-[11px] mb-2 leading-relaxed font-sans">
+                                    Secondary lab tests are automatically supplied using population baseline medians:
+                                </p>
+                            </div>
+                            <div class="d-flex flex-wrap gap-1.5 font-mono text-[10px] text-zinc-300">
+                                <span class="px-2 py-0.5 rounded bg-[#181818] border border-[#262626]">Glucose: 100 mg/dL</span>
+                                <span class="px-2 py-0.5 rounded bg-[#181818] border border-[#262626]">Insulin: 79 μU/mL</span>
+                                <span class="px-2 py-0.5 rounded bg-[#181818] border border-[#262626]">Skin: 21 mm</span>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- ==================== RIGHT COLUMN: MODEL SPECIFICATIONS & LIVE PREVIEW ==================== -->
-                <div class="col-lg-4">
-                    <div class="d-flex flex-column gap-4">
-                        
-                        <!-- Live Dynamic Risk Meter Preview -->
-                        <div class="axiom-card p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="font-mono text-xs text-zinc-400 text-uppercase fw-semibold">Real-Time Risk Meter</span>
-                                <span class="axiom-pulse-dot"></span>
-                            </div>
+                <!-- Hidden inputs for model compatibility -->
+                <input type="hidden" id="input_Glucose" name="Glucose" value="100">
+                <input type="hidden" id="input_SkinThickness" name="SkinThickness" value="21">
+                <input type="hidden" id="input_Insulin" name="Insulin" value="79">
 
-                            <div class="progress mb-2.5" style="height: 8px; background: #222222; border-radius: 9999px;">
-                                <div class="progress-bar bg-emerald-500" id="liveRiskMeter" role="progressbar" style="width: 15%; transition: width 0.25s ease;"></div>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span id="liveRiskLabel" class="text-emerald-400 font-mono text-xs">Estimated 15% (Low Risk)</span>
-                                <span class="text-zinc-600 font-mono text-[10px]">Heuristic preview</span>
-                            </div>
-                        </div>
-
-                        <!-- Model Specifications Panel (Axiom Reference Spec Panel) -->
-                        <div class="axiom-card p-4">
-                            <span class="font-mono text-xs text-zinc-400 text-uppercase d-block mb-3 fw-semibold">Model Specifications</span>
-                            
-                            <div class="d-flex flex-column gap-2.5 font-mono text-xs">
-                                <div class="d-flex justify-content-between text-zinc-400">
-                                    <span>Architecture:</span>
-                                    <span class="text-white">Random Forest (150 Trees)</span>
-                                </div>
-                                <div class="d-flex justify-content-between text-zinc-400">
-                                    <span>Test Accuracy:</span>
-                                    <span class="text-emerald-400 fw-bold">74.68%</span>
-                                </div>
-                                <div class="d-flex justify-content-between text-zinc-400">
-                                    <span>Macro ROC-AUC:</span>
-                                    <span class="text-emerald-400 fw-bold">0.8154</span>
-                                </div>
-                                <div class="d-flex justify-content-between text-zinc-400">
-                                    <span>Preprocessing:</span>
-                                    <span class="text-white">StandardScaler (Z-Score)</span>
-                                </div>
-                                <div class="d-flex justify-content-between text-zinc-400">
-                                    <span>Dataset:</span>
-                                    <span class="text-white">Pima Indians Diabetes</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Diagnostic Protocol Information -->
-                        <div class="axiom-card p-4">
-                            <span class="font-mono text-xs text-zinc-400 text-uppercase d-block mb-2 fw-semibold">Protocol Guidelines</span>
-                            <p class="text-zinc-400 text-xs leading-relaxed mb-3">
-                                Input values represent fasting plasma blood test metrics. Z-score normalization maps disparate physiological units into the orthogonal feature manifold before ensemble voting.
-                            </p>
-                            <div class="d-flex align-items-center gap-2 text-zinc-500 font-mono text-[11px]">
-                                <i class="fa-solid fa-lock text-emerald-400"></i> Local HIPAA-compliant session
-                            </div>
-                        </div>
-
-                        <!-- Loading State Indicator (Hidden until submit) -->
-                        <div id="predictLoadingState" class="axiom-card p-4 text-center d-none">
-                            <div class="spinner-border text-emerald-400 mb-3" role="status"></div>
-                            <h6 class="text-white fw-bold font-mono">Calibrating Diagnostic Tensor...</h6>
-                            <span class="text-zinc-500 font-mono text-xs">Computing feature splits and ensemble votes</span>
-                        </div>
-
-                    </div>
+                <!-- Action Button -->
+                <div class="mt-3">
+                    <button type="submit" class="btn-axiom-primary w-100 py-2.5 fs-6" id="predictSubmitBtn">
+                        <i class="fa-solid fa-bolt me-2"></i> Predict Diabetes Risk
+                    </button>
                 </div>
 
+            </form>
+
+            <!-- Loading State Indicator -->
+            <div id="predictLoadingState" class="text-center py-4 d-none">
+                <div class="spinner-border text-emerald-400 mb-2" role="status"></div>
+                <h6 class="text-white fw-bold font-mono text-sm mb-0">Evaluating Multi-Variable Risk...</h6>
+                <span class="text-zinc-500 font-mono text-xs">Computing Random Forest ensemble votes</span>
             </div>
-        </form>
+
+            <!-- Result Display Card (Appears inline below inputs upon prediction) -->
+            <div id="predictionResultCard" class="mt-4 pt-3 border-top border-[#222222] d-none">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+                    <div>
+                        <span class="font-mono text-[11px] text-zinc-400 text-uppercase d-block mb-0.5">Evaluation Result</span>
+                        <h4 class="text-white fw-bold mb-0 font-display" id="resultClassification">Non-Diabetic</h4>
+                    </div>
+                    <span class="badge px-3 py-1 font-mono text-xs rounded-pill" id="resultRiskBadge">Low Risk</span>
+                </div>
+
+                <div class="row g-2.5 mb-3">
+                    <div class="col-sm-6">
+                        <div class="p-2.5 rounded-2 bg-[#101010] border border-[#222222]">
+                            <span class="text-zinc-500 font-mono text-[11px] d-block mb-0.5">Diabetic Probability</span>
+                            <span class="font-display fw-bold fs-4 text-emerald-400" id="resultProbability">2.0%</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-2.5 rounded-2 bg-[#101010] border border-[#222222]">
+                            <span class="text-zinc-500 font-mono text-[11px] d-block mb-0.5">Clinical Classification</span>
+                            <span class="font-sans text-xs text-zinc-200 fw-medium d-block mt-1" id="resultClinicalTag">Normal Glycemic State</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-2.5 rounded-2 bg-[#101010] border border-[#222222] mb-3">
+                    <span class="text-zinc-400 font-mono text-[11px] d-block mb-1">
+                        <i class="fa-solid fa-circle-info text-zinc-500 me-1"></i> Clinical Summary
+                    </span>
+                    <p class="text-zinc-300 text-xs mb-0 leading-relaxed font-sans" id="resultExplanation">
+                        The ensemble estimates a low diabetic risk profile based on entered metabolic biometrics.
+                    </p>
+                </div>
+
+                <div class="p-2 rounded bg-[#0b0b0b] border border-[#1a1a1a] mb-3">
+                    <p class="text-zinc-500 text-[11px] mb-0 font-sans leading-relaxed">
+                        <strong class="text-zinc-400 font-mono">Medical Disclaimer:</strong> Probabilistic risk estimation intended for clinical research decision-support only. Not an independent medical diagnosis.
+                    </p>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                    <button type="button" class="btn-axiom-glass btn-sm px-3 py-1.5" id="predictAgainBtn">
+                        <i class="fa-solid fa-rotate-left me-1.5 text-xs"></i> Predict Again
+                    </button>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn-axiom-glass btn-sm px-3 py-1.5" id="downloadPdfBtn" target="_blank">
+                            <i class="fa-solid fa-file-pdf me-1.5 text-rose-400"></i> PDF Dossier
+                        </a>
+                        <a href="#" class="btn-axiom-primary btn-sm px-3 py-1.5" id="viewDossierBtn">
+                            <i class="fa-solid fa-arrow-up-right-from-square me-1.5 text-xs"></i> View Full Dossier
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
 </div>

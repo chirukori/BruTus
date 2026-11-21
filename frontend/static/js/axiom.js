@@ -208,11 +208,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // -------------------------------------------------------------
-    // 6. Prediction Form AJAX Submission
+    // 6. Prediction Form AJAX Submission & Inline Result Rendering
     // -------------------------------------------------------------
     const diabetesForm = document.getElementById('diabetesPredictionForm');
     const predictBtn = document.getElementById('predictSubmitBtn');
     const loadingState = document.getElementById('predictLoadingState');
+    const resultCard = document.getElementById('predictionResultCard');
+    const predictAgainBtn = document.getElementById('predictAgainBtn');
+
+    if (predictAgainBtn) {
+        predictAgainBtn.addEventListener('click', function () {
+            if (resultCard) resultCard.classList.add('d-none');
+            if (diabetesForm) {
+                diabetesForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    }
 
     if (diabetesForm) {
         diabetesForm.addEventListener('submit', function (e) {
@@ -220,16 +231,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (predictBtn) {
                 predictBtn.disabled = true;
-                predictBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Calibrating ML Tensor...`;
+                predictBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Evaluating Risk...`;
             }
             if (loadingState) {
                 loadingState.classList.remove('d-none');
             }
+            if (resultCard) {
+                resultCard.classList.add('d-none');
+            }
+
+            const allFeatures = [
+                'Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness',
+                'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age'
+            ];
 
             const payload = {};
-            featureKeys.forEach(k => {
+            allFeatures.forEach(k => {
                 const el = document.getElementById(`input_${k}`);
-                payload[k] = el ? parseFloat(el.value) : 0;
+                if (el) {
+                    payload[k] = parseFloat(el.value);
+                } else if (k === 'Glucose') {
+                    payload[k] = 100.0;
+                } else if (k === 'SkinThickness') {
+                    payload[k] = 21.0;
+                } else if (k === 'Insulin') {
+                    payload[k] = 79.0;
+                } else {
+                    payload[k] = 0;
+                }
             });
 
             const patientIdEl = document.getElementById('patientIdInput');
@@ -247,26 +276,72 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    setTimeout(() => {
-                        window.location.href = data.redirect_url;
-                    }, 400);
+                if (loadingState) loadingState.classList.add('d-none');
+                if (predictBtn) {
+                    predictBtn.disabled = false;
+                    predictBtn.innerHTML = `<i class="fa-solid fa-bolt me-2"></i> Predict Diabetes Risk`;
+                }
+
+                if (data.success && data.result) {
+                    const res = data.result;
+                    const clsEl = document.getElementById('resultClassification');
+                    const badgeEl = document.getElementById('resultRiskBadge');
+                    const probEl = document.getElementById('resultProbability');
+                    const tagEl = document.getElementById('resultClinicalTag');
+                    const expEl = document.getElementById('resultExplanation');
+                    const pdfBtn = document.getElementById('downloadPdfBtn');
+                    const dossierBtn = document.getElementById('viewDossierBtn');
+
+                    if (clsEl) clsEl.textContent = res.prediction_label;
+                    if (probEl) {
+                        probEl.textContent = `${res.probability_diabetic}%`;
+                        if (res.probability_diabetic >= 60) {
+                            probEl.className = 'font-display fw-bold fs-4 text-rose-400';
+                        } else if (res.probability_diabetic >= 35) {
+                            probEl.className = 'font-display fw-bold fs-4 text-amber-400';
+                        } else {
+                            probEl.className = 'font-display fw-bold fs-4 text-emerald-400';
+                        }
+                    }
+
+                    if (badgeEl) {
+                        badgeEl.textContent = res.risk_level;
+                        if (res.risk_badge === 'rose') {
+                            badgeEl.className = 'badge px-3 py-1 font-mono text-xs rounded-pill risk-badge-rose';
+                        } else if (res.risk_badge === 'amber') {
+                            badgeEl.className = 'badge px-3 py-1 font-mono text-xs rounded-pill risk-badge-amber';
+                        } else {
+                            badgeEl.className = 'badge px-3 py-1 font-mono text-xs rounded-pill risk-badge-emerald';
+                        }
+                    }
+
+                    if (tagEl) tagEl.textContent = res.clinical_tag;
+                    if (expEl) {
+                        if (res.recommendations && res.recommendations.length > 0) {
+                            expEl.textContent = res.recommendations[0];
+                        } else {
+                            expEl.textContent = `Random Forest ensemble evaluated probability: ${res.probability_diabetic}% (${res.risk_level}).`;
+                        }
+                    }
+
+                    if (pdfBtn) pdfBtn.href = `/api/download_pdf/${data.record_id}`;
+                    if (dossierBtn) dossierBtn.href = data.redirect_url;
+
+                    if (resultCard) {
+                        resultCard.classList.remove('d-none');
+                        resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
                 } else {
                     alert("Prediction Error: " + (data.error || "Unknown error"));
-                    if (predictBtn) {
-                        predictBtn.disabled = false;
-                        predictBtn.innerHTML = `<i class="fa-solid fa-bolt me-2"></i> Execute AI Risk Prediction`;
-                    }
-                    if (loadingState) loadingState.classList.add('d-none');
                 }
             })
             .catch(err => {
-                alert("Network communication error: " + err.message);
+                if (loadingState) loadingState.classList.add('d-none');
                 if (predictBtn) {
                     predictBtn.disabled = false;
-                    predictBtn.innerHTML = `<i class="fa-solid fa-bolt me-2"></i> Execute AI Risk Prediction`;
+                    predictBtn.innerHTML = `<i class="fa-solid fa-bolt me-2"></i> Predict Diabetes Risk`;
                 }
-                if (loadingState) loadingState.classList.add('d-none');
+                alert("Network communication error: " + err.message);
             });
         });
     }
